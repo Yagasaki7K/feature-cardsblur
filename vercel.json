@@ -6,11 +6,15 @@
       "use": "@vercel/static"
     },
     {
-      "src": "styles.css",
+      "src": "style.css",
       "use": "@vercel/static"
     },
     {
-      "src": "sketch.js",
+      "src": "script.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/*",
       "use": "@vercel/static"
     }
   ],
