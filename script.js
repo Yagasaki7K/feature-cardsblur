@@ -27,29 +27,28 @@ const ctrl = new Pane({
 
 const update = () => {
   document.documentElement.dataset.theme = config.theme
-
-  const blurNode = document.querySelector('filter#blur feGaussianBlur')
-  if (blurNode)
-    blurNode.setAttribute('stdDeviation', String(config.iconBlur))
-
-  const root = document.documentElement.style
-  root.setProperty('--icon-saturate', config.iconSaturate)
-  root.setProperty('--icon-brightness', config.iconBrightness)
-  root.setProperty('--icon-contrast', config.iconContrast)
-  root.setProperty('--icon-scale', config.iconScale)
-  root.setProperty('--icon-opacity', config.iconOpacity)
-
-  root.setProperty('--border-width', config.borderWidth)
-  root.setProperty('--border-blur', config.borderBlur)
-  root.setProperty('--border-saturate', config.borderSaturate)
-  root.setProperty('--border-brightness', config.borderBrightness)
-  root.setProperty('--border-contrast', config.borderContrast)
-
-  document.documentElement.dataset.exclude = String(config.exclude)
+  document
+    .querySelector('filter#blur feGaussianBlur')
+    .setAttribute('stdDeviation', config.iconBlur)
+  document.documentElement.style.setProperty('--icon-saturate', config.iconSaturate)
+  document.documentElement.style.setProperty('--icon-brightness', config.iconBrightness)
+  document.documentElement.style.setProperty('--icon-contrast', config.iconContrast)
+  document.documentElement.style.setProperty('--icon-scale', config.iconScale)
+  document.documentElement.style.setProperty('--icon-opacity', config.iconOpacity)
+  document.documentElement.style.setProperty('--border-width', config.borderWidth)
+  document.documentElement.style.setProperty('--border-blur', config.borderBlur)
+  document.documentElement.style.setProperty('--border-saturate', config.borderSaturate)
+  document.documentElement.style.setProperty('--border-brightness', config.borderBrightness)
+  document.documentElement.style.setProperty('--border-contrast', config.borderContrast)
+  document.documentElement.dataset.exclude = config.exclude
 }
 
-const sync = () => {
-  if (!document.startViewTransition) return update()
+const sync = (event) => {
+  if (
+    !document.startViewTransition ||
+    event.target.controller.view.labelElement.innerText !== 'theme'
+  )
+    return update()
   document.startViewTransition(() => update())
 }
 
@@ -108,7 +107,7 @@ borderFolder.addBinding(config, 'borderWidth', {
 
 borderFolder.addBinding(config, 'borderBlur', {
   label: 'blur',
- min: 0,
+  min: 0,
   max: 100,
   step: 1,
 })
@@ -149,18 +148,20 @@ ctrl.on('change', sync)
 
 update()
 
-const tweakSelector = '.tp-dfwv'
-const draggable = Draggable.create(tweakSelector, {
+const tweakClass = 'div.tp-dfwv'
+const draggable = Draggable.create(tweakClass, {
   type: 'x,y',
   allowEventDefault: true,
-  trigger: tweakSelector + ' button.tp-rotv_b',
+  trigger: tweakClass + ' button.tp-rotv_b',
 })
 
-document.querySelector(tweakSelector)?.addEventListener('dblclick', () => {
-  gsap.to(tweakSelector, {
+document.querySelector(tweakClass).addEventListener('dblclick', () => {
+  gsap.to(tweakClass, {
     x: `+=${draggable[0].x * -1}`,
     y: `+=${draggable[0].y * -1}`,
-    onComplete: () => gsap.set(tweakSelector, { clearProps: 'all' }),
+    onComplete: () => {
+      gsap.set(tweakClass, { clearProps: 'all' })
+    },
   })
 })
 
